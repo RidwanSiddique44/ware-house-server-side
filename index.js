@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -14,6 +15,14 @@ async function run() {
     try {
         await client.connect();
         const productCollection = client.db('stockData').collection('products');
+
+        app.post('/signin', async (req, res) => {
+            const user = req.body;
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+            res.send({ accessToken });
+
+        })
+
         app.get('/products', async (req, res) => {
             const query = {};
             const cursor = productCollection.find(query);
